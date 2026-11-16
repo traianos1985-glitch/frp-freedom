@@ -8,7 +8,6 @@ Users must ensure they have legal authorization before proceeding with any bypas
 """
 
 import sys
-import os
 import logging
 from pathlib import Path
 
@@ -33,10 +32,6 @@ def main():
         
         # Load configuration
         config = Config()
-        # Temporarily enable debug mode for troubleshooting
-        config.set('app.debug_mode', True)
-        config.set('security.encrypt_logs', False)
-        
         # Create and run the main application
         app = FRPFreedomApp(config)
         app.run()

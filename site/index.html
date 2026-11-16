@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f3ef" />
+    <meta name="description" content="FRP Freedom is a local desktop utility for device identification and safe diagnostics. It is not a browser-based unlock service." />
+    <title>FRP Freedom — Desktop diagnostics</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f4f3ef;
+        --ink: #18221e;
+        --muted: #66736b;
+        --line: #d8ddd6;
+        --green: #315b49;
+        --green-dark: #244637;
+        --lime: #d9ef9c;
+        --white: #fffefa;
+        --serif: Georgia, "Times New Roman", serif;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      .shell { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+      .topbar {
+        min-height: 82px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+      .brand-mark {
+        width: 34px; height: 34px; display: grid; place-items: center;
+        background: var(--green); color: var(--lime); border-radius: 9px;
+        font-size: 11px; font-weight: 800; letter-spacing: -.04em;
+      }
+      .brand-name { font-weight: 650; letter-spacing: -.035em; }
+      .local-tag {
+        display: inline-flex; align-items: center; gap: 8px; color: var(--muted);
+        font-size: 12px; font-weight: 600; letter-spacing: .02em;
+      }
+      .local-tag::before {
+        content: ""; width: 7px; height: 7px; border-radius: 50%;
+        background: #63876d; box-shadow: 0 0 0 3px #63876d20;
+      }
+      main { padding: 76px 0 88px; }
+      .hero {
+        display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+        align-items: end; gap: 70px; padding-bottom: 70px;
+      }
+      .eyebrow {
+        display: flex; align-items: center; gap: 10px; margin: 0 0 24px;
+        color: var(--green); font-size: 11px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase;
+      }
+      .eyebrow::before { content: ""; width: 24px; height: 1px; background: currentColor; }
+      h1 {
+        max-width: 680px; margin: 0; font-family: var(--serif); font-weight: 400;
+        font-size: clamp(48px, 7vw, 82px); line-height: .99; letter-spacing: -.055em;
+      }
+      h1 em { color: var(--green); font-weight: 400; }
+      .hero-copy { max-width: 360px; padding-bottom: 7px; }
+      .hero-copy p { margin: 0 0 25px; color: var(--muted); font-size: 16px; line-height: 1.75; }
+      .button {
+        min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+        padding: 0 19px; border-radius: 6px; background: var(--green); color: white;
+        font-size: 13px; font-weight: 650; text-decoration: none; transition: background .18s, transform .18s;
+      }
+      .button:hover { background: var(--green-dark); transform: translateY(-1px); }
+      .button:focus-visible, a:focus-visible { outline: 3px solid #94b95b; outline-offset: 4px; }
+      .button svg { width: 15px; height: 15px; }
+      .hero-note { margin-top: 12px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+      .rule { border: 0; border-top: 1px solid var(--line); margin: 0; }
+      .facts {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .fact { min-height: 142px; padding: 25px 28px 24px 0; }
+      .fact + .fact { padding-left: 28px; border-left: 1px solid var(--line); }
+      .fact-label { margin: 0 0 13px; color: var(--muted); font-size: 11px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+      .fact strong { display: block; font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: -.02em; }
+      .fact span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+      .lower {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 70px; padding-top: 62px;
+      }
+      h2 { margin: 0 0 15px; font-family: var(--serif); font-size: 30px; font-weight: 400; letter-spacing: -.035em; }
+      .lower p { max-width: 470px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+      .notice {
+        padding: 23px 24px; border: 1px solid #cad4c6; border-radius: 8px; background: #edf0e8;
+      }
+      .notice-title { margin: 0 0 10px; color: var(--green-dark); font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+      .notice p { color: #4f5c53; font-size: 13px; }
+      .notice a { font-weight: 650; text-underline-offset: 3px; }
+      footer { border-top: 1px solid var(--line); }
+      .footer-inner { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--muted); font-size: 11px; }
+      .footer-inner a { text-underline-offset: 3px; }
+      @media (max-width: 760px) {
+        .shell { width: min(100% - 36px, 560px); }
+        .topbar { min-height: 70px; }
+        main { padding: 58px 0 64px; }
+        .hero { grid-template-columns: 1fr; gap: 24px; padding-bottom: 46px; }
+        .hero-copy { max-width: 520px; }
+        h1 { max-width: 600px; font-size: clamp(49px, 14vw, 72px); }
+        .facts { grid-template-columns: 1fr; }
+        .fact, .fact + .fact { min-height: auto; padding: 21px 0; border-left: 0; }
+        .fact + .fact { border-top: 1px solid var(--line); }
+        .fact-label { margin-bottom: 8px; }
+        .lower { grid-template-columns: 1fr; gap: 27px; padding-top: 43px; }
+        .footer-inner { min-height: 76px; align-items: flex-start; justify-content: center; flex-direction: column; gap: 6px; padding: 17px 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="shell topbar">
+      <a class="brand" href="#top" aria-label="FRP Freedom home">
+        <span class="brand-mark" aria-hidden="true">FF</span>
+        <span class="brand-name">FRP Freedom</span>
+      </a>
+      <span class="local-tag">Desktop utility</span>
+    </header>
+
+    <main id="top" class="shell">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <p class="eyebrow">Device care, with evidence</p>
+          <h1 id="hero-title">Diagnostics belong <em>on your machine.</em></h1>
+        </div>
+        <div class="hero-copy">
+          <p>FRP Freedom is a local Windows desktop utility for device identification and safe diagnostics. This website is informational; it does not connect to or modify a phone.</p>
+          <a class="button" href="https://github.com/traianos1985-glitch/frp-freedom/actions/workflows/build.yml" target="_blank" rel="noreferrer">
+            Find Windows build artifacts
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 12 12 4M5 4h7v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="hero-note">CI artifacts are temporary and unsigned. Verify the SHA-256 file before use.</div>
+        </div>
+      </section>
+
+      <hr class="rule" />
+      <section class="facts" aria-label="Product details">
+        <div class="fact">
+          <p class="fact-label">Where it runs</p>
+          <strong>Windows desktop</strong>
+          <span>The packaged build runs locally; this site is not the application.</span>
+        </div>
+        <div class="fact">
+          <p class="fact-label">What it can claim</p>
+          <strong>Read-only diagnostics</strong>
+          <span>Unknown is reported when device evidence is incomplete.</span>
+        </div>
+        <div class="fact">
+          <p class="fact-label">Device coverage</p>
+          <strong>Not hardware-verified</strong>
+          <span>No physical-device compatibility is claimed by this project.</span>
+        </div>
+      </section>
+
+      <section class="lower" aria-label="Scope and safety">
+        <div>
+          <h2>Honest about its limits.</h2>
+          <p>The project does not provide an online unlock service. FRP circumvention is disabled in this branch. ADB connectivity or model detection is not evidence that an anti-theft lock has been removed.</p>
+        </div>
+        <aside class="notice" aria-labelledby="notice-title">
+          <p id="notice-title" class="notice-title">Use official recovery channels</p>
+          <p>For account or ownership issues, use the device manufacturer’s or account provider’s official recovery process. Review the <a href="https://github.com/traianos1985-glitch/frp-freedom/blob/v0/frp-safety-audit/SECURITY_AUDIT.md" target="_blank" rel="noreferrer">technical audit</a> and <a href="https://github.com/traianos1985-glitch/frp-freedom" target="_blank" rel="noreferrer">source repository</a> for current scope and test limits.</p>
+        </aside>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer-inner">
+        <span>FRP Freedom · Local desktop diagnostics</span>
+        <a href="https://github.com/traianos1985-glitch/frp-freedom" target="_blank" rel="noreferrer">Open source repository</a>
+      </div>
+    </footer>
+  </body>
+</html>

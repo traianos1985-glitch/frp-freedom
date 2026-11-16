@@ -397,77 +397,22 @@ class BypassManager:
         risk_scores = {'low': 1, 'medium': 2, 'high': 3}
         return risk_scores.get(risk_level, 2)
     
-    def execute_bypass(self, device: DeviceInfo, method_name: str, 
-                      progress_callback: Optional[Callable[[str, int], None]] = None) -> Dict[str, Any]:
-        """Execute a specific bypass method with AI monitoring"""
+    def execute_bypass(self, device: DeviceInfo, method_name: str,
+                       progress_callback: Optional[Callable[[str, int], None]] = None) -> Dict[str, Any]:
+        """Fail closed: FRP circumvention is not an enabled operation."""
         self.progress_callback = progress_callback
-        start_time = time.time()
-        
-        # Find the method
-        method = next((m for m in self.available_methods if m.name == method_name), None)
-        if not method:
-            return {
-                'result': BypassResult.FAILED,
-                'message': f'Unknown bypass method: {method_name}',
-                'details': {}
-            }
-        
-        self.logger.info(f"Starting bypass method '{method_name}' on device {device.serial}")
-        self._update_progress(f"Initializing {method.description}", 0)
-        
-        try:
-            # Pre-bypass checks
-            if not self._pre_bypass_checks(device, method):
-                return {
-                    'result': BypassResult.VERIFICATION_FAILED,
-                    'message': 'Pre-bypass verification failed',
-                    'details': {}
-                }
-            
-            # Execute the appropriate bypass method
-            if method.category == 'adb':
-                result = self._execute_adb_bypass(device, method)
-            elif method.category == 'interface':
-                result = self._execute_interface_bypass(device, method)
-            elif method.category == 'system':
-                result = self._execute_system_bypass(device, method)
-            elif method.category == 'hardware':
-                result = self._execute_hardware_bypass(device, method)
-            else:
-                result = {
-                    'result': BypassResult.FAILED,
-                    'message': f'Unsupported method category: {method.category}',
-                    'details': {}
-                }
-            
-            # Post-bypass verification
-            if result['result'] == BypassResult.SUCCESS:
-                self._update_progress("Verifying bypass success", 90)
-                if self._verify_bypass_success(device):
-                    self._update_progress("Bypass completed successfully", 100)
-                    self.logger.info(f"Bypass method '{method_name}' completed successfully")
-                else:
-                    result['result'] = BypassResult.PARTIAL
-                    result['message'] = "Bypass partially successful, manual verification needed"
-            
-            # Update AI performance tracking
-            execution_time = time.time() - start_time
-            self.ai_engine.update_method_performance(method_name, device, result['result'], execution_time)
-            
-            return result
-            
-        except Exception as e:
-            execution_time = time.time() - start_time
-            self.logger.error(f"Bypass method '{method_name}' failed with error: {e}")
-            
-            # Update AI with failure
-            self.ai_engine.update_method_performance(method_name, device, BypassResult.FAILED, execution_time)
-            
-            return {
-                 'result': BypassResult.FAILED,
-                 'message': f'Bypass execution failed: {str(e)}',
-                 'details': {'error': str(e), 'execution_time': execution_time}
-             }
+        self.logger.warning(
+            "Blocked FRP circumvention request for method %s on device %s",
+            method_name,
+            device.serial,
+        )
+        if progress_callback:
+            progress_callback("FRP bypass is disabled; use the device owner's official recovery process.", 0)
+        return {
+            'result': BypassResult.FAILED,
+            'message': 'FRP circumvention is disabled. No device command was sent.',
+            'details': {'execution_state': 'blocked', 'frp_status': 'unknown'},
+        }
     
     def _pre_bypass_checks(self, device: DeviceInfo, method: BypassMethod) -> bool:
         """Perform pre-bypass security and compatibility checks"""

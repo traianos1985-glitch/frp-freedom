@@ -41,6 +41,11 @@ The Android SDK Platform Tools include ADB (Android Debug Bridge) and Fastboot, 
    fastboot --version
    ```
 
+#### Portable Windows package
+A portable Windows build is produced by the GitHub Actions workflow on pull requests and pushes to `main`/`master`. Download the `FRP-Freedom-Windows` workflow artifact, extract the ZIP, and keep its folder structure intact. The archive includes a SHA-256 sidecar file for integrity checking; compare it with a locally calculated hash before running it. This is an unsigned CI artifact, not a signed installer or production release.
+
+The desktop GUI runs locally on Windows and is not a Vercel web deployment. macOS and Linux users can run from source using the Python instructions below.
+
 #### Python Dependencies
 Install the required Python packages:
 

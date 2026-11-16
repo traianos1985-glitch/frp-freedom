@@ -131,39 +131,13 @@ class SamsungADBEnabler:
         return info
 
     def enable_adb(self, port_device: str, progress_callback: Optional[Callable[[str], None]] = None) -> bool:
-        """Run the sequence to enable ADB trying multiple methods"""
-        self.logger.info(f"Attempting to enable ADB on {port_device}...")
-        
-        methods = [
-            ("Method 2024", self._method_2024),
-            ("Method 2022 (Aug-Dec)", self._method_aug2022_dec2022),
-            ("Method Pre-2022", self._method_pre_aug2022)
-        ]
-
-        try:
-            # Open serial port once if possible, or per method
-            # Usually better to close/re-open between methods or retries
-            
-            for name, method in methods:
-                 if progress_callback:
-                     progress_callback(f"Trying {name}...")
-                 self.logger.info(f"Trying {name}...")
-                 
-                 if method(port_device, progress_callback):
-                     self.logger.info(f"{name} sequence completed. Allowing time for ADB to appear.")
-                     if progress_callback:
-                         progress_callback(f"{name} executed. Checking for ADB...")
-                     return True
-                 
-                 time.sleep(1)
-
-            return False
-            
-        except Exception as e:
-            self.logger.error(f"Unexpected error during enable_adb: {e}")
-            if progress_callback:
-                 progress_callback(f"Error: {e}")
-            return False
+        """ADB activation through modem AT sequences is disabled and fails closed."""
+        self.logger.warning("Blocked modem AT sequence request for port %s", port_device)
+        if progress_callback:
+            progress_callback(
+                "This FRP-related AT-command operation is disabled. No commands were sent."
+            )
+        return False
 
     def _execute_sequence(self, port_device: str, commands: List[str], method_name: str, progress_callback: Optional[Callable[[str], None]]) -> bool:
         """Execute a list of AT commands"""
