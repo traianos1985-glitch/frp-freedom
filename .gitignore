@@ -137,6 +137,8 @@ venv.bak/
 
 # mkdocs documentation
 /site
+!/site/
+!/site/**
 
 # mypy
 .mypy_cache/
@@ -195,3 +197,5 @@ temp/
 
 # Logs directory
 logs/
+.vercel
+.env*
