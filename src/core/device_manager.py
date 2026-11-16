@@ -652,54 +652,15 @@ class DeviceManager:
         return props
     
     def _check_frp_status(self, serial: str) -> str:
-        """Check FRP status of device"""
-        try:
-            # Try multiple methods to check FRP status
-            
-            # Method 1: Check persistent properties
-            result = subprocess.run(
-                [str(self.adb_path), "-s", serial, "shell", "getprop", "ro.frp.pst"],
-                capture_output=True, text=True, timeout=5
-            )
-            
-            if result.returncode == 0 and result.stdout.strip():
-                frp_value = result.stdout.strip()
-                if frp_value in ['', '0', 'none']:
-                    return 'disabled'
-                else:
-                    return 'enabled'
-            
-            # Method 2: Check accounts database
-            result = subprocess.run(
-                [str(self.adb_path), "-s", serial, "shell", 
-                 "sqlite3 /data/system/users/0/accounts.db 'SELECT count(*) FROM accounts'"],
-                capture_output=True, text=True, timeout=5
-            )
-            
-            if result.returncode == 0:
-                count = result.stdout.strip()
-                if count and count.isdigit() and int(count) > 0:
-                    return 'enabled'
-                else:
-                    return 'disabled'
-            
-            # Method 3: Check setup wizard state
-            result = subprocess.run(
-                [str(self.adb_path), "-s", serial, "shell", 
-                 "settings get secure user_setup_complete"],
-                capture_output=True, text=True, timeout=5
-            )
-            
-            if result.returncode == 0:
-                setup_complete = result.stdout.strip()
-                if setup_complete == '0':
-                    return 'frp_locked'
-                elif setup_complete == '1':
-                    return 'setup_complete'
-            
-        except Exception as e:
-            self.logger.error(f"Error checking FRP status for {serial}: {e}")
-        
+        """Return unknown unless an authoritative, independent FRP signal exists.
+
+        ADB properties, account counts, setup completion, and successful shell access
+        are not evidence that Factory Reset Protection was removed.
+        """
+        self.logger.info(
+            "FRP state for device %s is unknown: this diagnostic has no authoritative source",
+            serial,
+        )
         return 'unknown'
     
     def _get_device_imei(self, serial: str) -> str:
