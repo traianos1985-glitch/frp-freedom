@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build-windows:
@@ -27,11 +29,24 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --noconfirm --onedir --windowed --name "FRP-Freedom" --add-data "src;src" --add-data "config.yaml;." main.py
+          pyinstaller --noconfirm --clean --onedir --windowed --name "FRP-Freedom" --add-data "src;src" --add-data "config.yaml;." main.py
 
-      - name: Upload Build Artifact
+      - name: Verify and archive portable app
+        shell: pwsh
+        run: |
+          $app = "dist/FRP-Freedom/FRP-Freedom.exe"
+          if (!(Test-Path $app)) { throw "Packaged executable not found: $app" }
+          Compress-Archive -Path "dist/FRP-Freedom" -DestinationPath "dist/FRP-Freedom-Windows.zip" -Force
+          $hash = (Get-FileHash "dist/FRP-Freedom-Windows.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  FRP-Freedom-Windows.zip" | Set-Content "dist/FRP-Freedom-Windows.zip.sha256"
+
+      - name: Upload portable Windows package
         uses: actions/upload-artifact@v4
         with:
           name: FRP-Freedom-Windows
-          path: dist/FRP-Freedom/
+          path: |
+            dist/FRP-Freedom-Windows.zip
+            dist/FRP-Freedom-Windows.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
           
