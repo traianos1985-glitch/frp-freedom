@@ -74,7 +74,8 @@
 
 - `PYTHONPATH=. uv run pytest -q tests`: **PASS**, 56 tests passed.
 - `python -m compileall -q src tests` και `git diff --check`: **PASS**.
-- GitHub Actions CI: **NOT RUN** σε αυτό το περιβάλλον.
+- GitHub Actions CI: εκτελέστηκε για το PR· οι Python 3.10/3.11 jobs και το Linux build πέρασαν, ενώ η Python 3.9 job απέτυχε πριν από checkout/tests επειδή το `ubuntu-latest` αντιστοιχούσε σε Ubuntu 26.04 χωρίς διαθέσιμο Python 3.9. Το workflow ενημερώθηκε να εκτελεί Python 3.9 σε `ubuntu-22.04`. Η επανεκτέλεση μετά την αλλαγή εκκρεμεί.
+- Το Vercel deployment check απέτυχε· δεν είναι έλεγχος λειτουργικότητας της Python εφαρμογής και δεν τεκμηριώθηκε από αυτόν αιτία σχετική με τις αλλαγές.
 - Physical device tests: **NOT RUN** — δεν διατέθηκε συσκευή.
 - Αλλαγές δεν πρέπει να χαρακτηριστούν ως hardware-verified ή production-ready. Ο έλεγχος αυτός δεν ισοδυναμεί με ανεξάρτητο security penetration test.
 
